@@ -1,0 +1,21 @@
+# JetBrains IDE
+.idea/
+*.iml
+
+# Arduino / PlatformIO build output
+.pio/
+build/
+*.hex
+*.bin
+
+# Secrets - NOOIT committen
+secrets.h
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (dashboard)
+node_modules/
+dist/
