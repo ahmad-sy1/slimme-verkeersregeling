@@ -135,7 +135,7 @@ lib/VriConfig/    shared hardware config (board MAC addresses)
 include/          project-wide headers
 test/             PlatformIO unit tests
 docs/             functional design, decisions, client feedback
-platformio.ini    build environments (shared [env] + master/slave)
+platformio.ini    build environments (shared [env] + master, slave, blink, mac_address)
 ```
 
 ## Getting started
