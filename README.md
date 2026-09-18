@@ -130,10 +130,10 @@ No simulation software is used; the prototype is a physical test setup.
 ```
 src/master/       master controller firmware   (pio run -e master)
 src/slave/        slave controller firmware    (pio run -e slave)
+src/basics/       practice sketches            (pio run -e blink / -e mac_address)
 lib/VriConfig/    shared hardware config (board MAC addresses)
 include/          project-wide headers
 test/             PlatformIO unit tests
-esp32-basics/     standalone Arduino IDE sketches (blink_test, mac_address)
 docs/             functional design, decisions, client feedback
 platformio.ini    build environments (shared [env] + master/slave)
 ```
