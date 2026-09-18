@@ -126,13 +126,16 @@ No simulation software is used; the prototype is a physical test setup.
 | Dashboard | *(to be decided — see `docs/decisions.md`)* |
 
 ## Repository structure
-Temporary structure
 
 ```
-master/          master controller firmware
-slave/           slave controller firmware
-dashboard/       real-time dashboard for the control room
-docs/            design, test plan, test reports, decisions, client feedback
+src/master/       master controller firmware   (pio run -e master)
+src/slave/        slave controller firmware    (pio run -e slave)
+src/basics/       practice sketches            (pio run -e blink / -e mac_address)
+lib/VriConfig/    shared hardware config (board MAC addresses)
+include/          project-wide headers
+test/             PlatformIO unit tests
+docs/             functional design, decisions, client feedback
+platformio.ini    build environments (shared [env] + master, slave, blink, mac_address)
 ```
 
 ## Getting started
