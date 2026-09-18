@@ -27,6 +27,23 @@ IDE is no longer used; `.ino` sketches are now `main.cpp` files under `src/`.
 PlatformIO Core is the `pio` command-line tool. You need it even if you plan to use an
 editor plugin later.
 
+### Windows
+
+1. Install Python from <https://www.python.org/downloads/>. In the installer, tick
+   **Add python.exe to PATH**.
+2. In PowerShell:
+
+   ```powershell
+   py -m pip install --user platformio
+   py -c "import site; print(site.getuserbase() + '\Scripts')"
+   ```
+
+3. The second command prints a folder, for example
+   `C:\Users\<you>\AppData\Roaming\Python\Python312\Scripts`. Add that folder to your
+   `PATH`: Start → *Edit environment variables for your account* → **Path** → **Edit** →
+   **New** → paste the folder → **OK**.
+4. Close and reopen PowerShell.
+
 ### macOS — Homebrew (recommended)
 
 ```bash
@@ -56,31 +73,14 @@ pipx install platformio
 
 Then open a new terminal.
 
-### Windows
-
-1. Install Python from <https://www.python.org/downloads/>. In the installer, tick
-   **Add python.exe to PATH**.
-2. In PowerShell:
-
-   ```powershell
-   py -m pip install --user platformio
-   py -c "import site; print(site.getuserbase() + '\Scripts')"
-   ```
-
-3. The second command prints a folder, for example
-   `C:\Users\<you>\AppData\Roaming\Python\Python312\Scripts`. Add that folder to your
-   `PATH`: Start → *Edit environment variables for your account* → **Path** → **Edit** →
-   **New** → paste the folder → **OK**.
-4. Close and reopen PowerShell.
-
 ### Verify
 
 ```bash
 pio --version
 ```
 
-Expected output: `PlatformIO Core, version 6.x.x`. If you get `command not found`, see
-[Troubleshooting](#troubleshooting).
+Expected output: `PlatformIO Core, version 6.x.x`. If you get `'pio' is not recognized`
+(Windows) or `command not found` (macOS), see [Troubleshooting](#troubleshooting).
 
 ---
 
@@ -91,12 +91,17 @@ of two chips:
 
 | Chip | How to recognise it | Driver |
 |---|---|---|
-| **CH340** (WCH) | Small rectangular chip near the USB port, marked `CH340C`, `CH340G` or `CH340K` | macOS: usually built in. Windows: *CH341SER* from <https://www.wch-ic.com> |
-| **CP210x** (Silicon Labs) | Small square chip near the USB port, marked `CP2102` or `CP2104` (often with the SiLabs logo) | macOS: usually built in. Windows: *CP210x Universal Windows Driver* from <https://www.silabs.com> (often installed automatically by Windows Update) |
+| **CH340** (WCH) | Small rectangular chip near the USB port, marked `CH340C`, `CH340G` or `CH340K` | Windows: *CH341SER* from <https://www.wch-ic.com>. macOS: usually built in |
+| **CP210x** (Silicon Labs) | Small square chip near the USB port, marked `CP2102` or `CP2104` (often with the SiLabs logo) | Windows: *CP210x Universal Windows Driver* from <https://www.silabs.com> (often installed automatically by Windows Update). macOS: usually built in |
 
 The marking is tiny; use your phone camera to zoom in.
 
 ### Check that the port is visible
+
+**Windows** — plug the board in, then open **Device Manager** → **Ports (COM & LPT)**.
+You should see something like `USB-SERIAL CH340 (COM3)` or
+`Silicon Labs CP210x USB to UART Bridge (COM4)`. A device with a yellow warning triangle
+under *Other devices* means the driver is missing.
 
 **macOS** — plug the board in, then:
 
@@ -108,11 +113,6 @@ Look for a new entry such as `/dev/cu.usbserial-0001`, `/dev/cu.wchusbserial1420
 `/dev/cu.SLAB_USBtoUART`. Ignore `cu.Bluetooth-Incoming-Port` and `cu.debug-console`.
 Not sure which one is the board? Run the command with the board unplugged and again with
 it plugged in, and compare.
-
-**Windows** — open **Device Manager** → **Ports (COM & LPT)**. You should see something
-like `USB-SERIAL CH340 (COM3)` or `Silicon Labs CP210x USB to UART Bridge (COM4)`.
-A device with a yellow warning triangle under *Other devices* means the driver is
-missing.
 
 **Both** — PlatformIO can list ports too:
 
@@ -134,7 +134,8 @@ pio run -e blink
 check that your setup works.
 
 The first build downloads the ESP32 toolchain and framework (a few hundred MB) into
-`~/.platformio`. That takes a few minutes; later builds take seconds.
+`%USERPROFILE%\.platformio` (Windows) or `~/.platformio` (macOS). That takes a few
+minutes; later builds take seconds.
 
 Build every environment at once:
 
@@ -197,8 +198,8 @@ result on the LED, and `master` / `slave` do nothing yet.
 PlatformIO picks a port automatically. With several boards connected, name the port:
 
 ```bash
-pio run -e blink -t upload --upload-port /dev/cu.usbserial-0001   # macOS
 pio run -e blink -t upload --upload-port COM3                     # Windows
+pio run -e blink -t upload --upload-port /dev/cu.usbserial-0001   # macOS
 pio device monitor -e mac_address --port COM3
 ```
 
@@ -241,11 +242,11 @@ usually clearer there.
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| `pio: command not found` (macOS) or `'pio' is not recognized` (Windows) | The folder that contains `pio` is not on your `PATH` | Redo the `PATH` step in [Install PlatformIO Core](#1-install-platformio-core), then open a **new** terminal |
+| `'pio' is not recognized` (Windows) or `pio: command not found` (macOS) | The folder that contains `pio` is not on your `PATH` | Redo the `PATH` step in [Install PlatformIO Core](#1-install-platformio-core), then open a **new** terminal |
 | `error: externally-managed-environment` when running pip | Homebrew's Python does not allow `pip install` | Use `brew install platformio` or `pipx install platformio` |
-| `Resource busy` (macOS) or `Access is denied` / `could not open port` (Windows) | Another program has the serial port open, usually a leftover Arduino IDE Serial Monitor, or a second `pio device monitor` in another terminal | Close the Arduino IDE and any other serial monitor, then try again |
+| `Access is denied` / `could not open port` (Windows) or `Resource busy` (macOS) | Another program has the serial port open, usually a leftover Arduino IDE Serial Monitor, or a second `pio device monitor` in another terminal | Close the Arduino IDE and any other serial monitor, then try again |
 | Upload stuck on `Connecting........_____....` and then fails | The ESP32 did not enter download mode automatically | Run the upload again; when `Connecting...` appears, **hold the BOOT button** until the upload percentage starts, then release it |
-| No port visible in `ls /dev/cu.*` or Device Manager | Charge-only USB cable (no data wires), or missing driver | Try a different cable you know transfers data; check the [USB driver](#2-usb-driver) section |
+| No port visible in Device Manager or `ls /dev/cu.*` | Charge-only USB cable (no data wires), or missing driver | Try a different cable you know transfers data; check the [USB driver](#2-usb-driver) section |
 | `UnknownEnvNamesError` / `Unknown environment names 'X'` | The name after `-e` does not match an `[env:...]` in `platformio.ini` (typo, or `-` instead of `_`) | Use one of: `master`, `slave`, `blink`, `mac_address`. The error message lists the valid names |
 | First build is very slow | PlatformIO is downloading the ESP32 toolchain | Wait; this only happens once |
 | Serial monitor shows unreadable characters | Baud rate does not match the sketch | Open the monitor with `-e <env>` so it uses `monitor_speed` from `platformio.ini` |
