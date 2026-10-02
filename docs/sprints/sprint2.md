@@ -16,7 +16,7 @@ this document records what the team committed to and what was delivered.
 ## 2. Selected user stories
 
 Stories pulled from the backlog for this sprint. Acceptance criteria live in
-[`functional-design.md`](functional-design.md).
+[`functional-design.md`](../functional-design.md).
 
 | Story | Epic | Title | MoSCoW | Owner | Status |
 |---|---|---|---|---|---|
@@ -56,7 +56,7 @@ Short notes from the daily stand-ups: what changed, blockers, decisions.
 ## 6. Client feedback
 
 Feedback received during the review. Follow-up is recorded in
-[`client-feedback.md`](client-feedback.md).
+[`client-feedback.md`](../client-feedback.md).
 
 - *(feedback)*
 
