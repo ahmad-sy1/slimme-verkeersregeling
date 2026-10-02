@@ -134,18 +134,24 @@ src/basics/       practice sketches            (pio run -e blink / -e mac_addres
 lib/VriConfig/    shared hardware config (board MAC addresses)
 include/          project-wide headers
 test/             PlatformIO unit tests
-docs/             functional design, decisions, client feedback
+docs/             functional design, getting started
 platformio.ini    build environments (shared [env] + master, slave, blink, mac_address)
 ```
 
 ## Getting started
 
-*(expanded once the first firmware is in place)*
+The firmware is built with [PlatformIO](https://platformio.org). With PlatformIO Core
+installed:
 
 ```bash
 git clone https://github.com/ahmad-sy1/slimme-verkeersregeling.git
 cd slimme-verkeersregeling
+pio run                                        # build all environments, no board needed
+pio run -e mac_address -t upload -t monitor    # flash a board and open the serial monitor
 ```
+
+Installation, USB drivers, all environments and troubleshooting:
+[`docs/getting-started.md`](docs/getting-started.md).
 
 Wi-Fi credentials live in `secrets.h`. That file is listed in `.gitignore` and is never
 committed. Copy `secrets.example.h` to `secrets.h` and fill in your own values.
