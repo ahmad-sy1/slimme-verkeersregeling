@@ -37,7 +37,16 @@ Short notes from the daily stand-ups: what changed, blockers, decisions.
 |---|---|
 | *(date)* | *(notes)* |
 
-## 5. Sprint review
+## 5. Blockers and impediments
+
+Everything that stopped or slowed down work during this sprint: what happened, why it
+could not go ahead, and what was done about it.
+
+| Date | Story / task | What was blocked | Cause | Action taken | Status |
+|---|---|---|---|---|---|
+| *(date)* | US-xx | *(what could not go ahead)* | *(why: hardware, knowledge, dependency, time, ...)* | *(what was done or who was asked)* | Open / Solved |
+
+## 6. Sprint review
 
 ### Delivered
 
@@ -45,7 +54,10 @@ Short notes from the daily stand-ups: what changed, blockers, decisions.
 
 ### Not delivered
 
-| Story | Reason | Moves to |
+Stories that were not finished. Explain why, and refer to the blocker in section 5
+when there is one.
+
+| Story | Why it was not finished | Moves to |
 |---|---|---|
 | US-xx | *(reason)* | Backlog |
 
@@ -53,14 +65,14 @@ Short notes from the daily stand-ups: what changed, blockers, decisions.
 
 *(what was shown to the client and how)*
 
-## 6. Client feedback
+## 7. Client feedback
 
 Feedback received during the review. Follow-up is recorded in
 [`client-feedback.md`](../client-feedback.md).
 
 - *(feedback)*
 
-## 7. Retrospective
+## 8. Retrospective
 
 | What went well | What could be better | Action for next sprint |
 |---|---|---|
