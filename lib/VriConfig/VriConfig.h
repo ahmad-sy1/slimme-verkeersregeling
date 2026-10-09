@@ -29,7 +29,7 @@ struct SignalHeadPins {
 // {id,           name,       red, orange, green}
 const SignalHeadPins MAIN_ROAD_PINS[] = {
   {MAIN_A_LEFT,  "A left",    18,  13,  14},
-  {MAIN_A_RIGHT, "A right",   19,  21,  22},  // red 19 unconfirmed: not seen in the test
+  {MAIN_A_RIGHT, "A right",   19,  21,  22},
   {MAIN_B_LEFT,  "B left",    27,  32,  26},
   {MAIN_B_RIGHT, "B right",   25,  33,  23},
 };
