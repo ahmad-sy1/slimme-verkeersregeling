@@ -126,16 +126,29 @@ Board `94:B9:7E:D9:E3:D4`.
 | 3 | Main road B left | yes | yes | yes | yes | Matches the pin table (red 27, orange 32, green 26) |
 | 4 | Main road B right | yes | yes | yes | yes | Matches the pin table (red 25, orange 33, green 23) |
 
-### Side road (slave 2)
+### Side road (slave 2), 2026-10-09
 
-Not checked yet.
+Board `7C:9E:BD:65:72:FC`. Where a colour was missing, the three pins of that pole were
+also switched on one at a time with `pin_scan` (steady, and blinking where nothing was
+seen), while the whole intersection was checked.
+
+| No. | Signal head | One pole only | Red | Orange | Green | Remark |
+|---|---|---|---|---|---|---|
+| 5 | Side road A left | yes | **no** | yes | yes | Red (GPIO 32) does not light up; GPIO 32 unreliable (once lit pole 6 red, not reproducible). Orange 33 and green 27 confirmed one by one |
+| 6 | Side road A right | yes | yes | **no** | yes | Orange (GPIO 13) does not light up, steady or blinking. Red 14 and green 26 confirmed one by one |
+| 7 | Side road B left | yes | yes | yes | yes | Matches the pin table (red 25, orange 23, green 22) |
+| 8 | Side road B right | yes | yes | yes | yes | Matches the pin table (red 21, orange 18, green 19) |
 
 ## Points of attention
 
 - **Side road A left red (GPIO 32) and A right orange (GPIO 13)** did not light up
-  visibly in any test. They are the only pins left for those LEDs, and the voltage
-  measurement (below) shows that an LED is connected. Probably a loose wire, an LED
-  the wrong way round or a very dim LED: check the wiring of these two.
+  visibly in any test, including the pole numbering check of 2026-10-09. They are the
+  only pins left for those LEDs, and the voltage measurement (below) shows that an LED
+  is connected. Probably a loose wire, an LED the wrong way round or a very dim LED:
+  check the wiring of these two.
+- **GPIO 32 is unreliable.** With GPIO 32 on alone, side road A right red (pole 6, wired
+  to GPIO 14) lit up once; this could not be reproduced. That points to a wiring fault
+  around GPIO 32, for example a loose wire touching another one.
 - **Main road A right red (GPIO 19)** was not reported in the pin scan (a steady LED is
   easy to miss). The pole numbering check of 2026-10-09 confirmed it.
 - "Left/right" follows the names used on the intersection. If the wrong two signal heads
