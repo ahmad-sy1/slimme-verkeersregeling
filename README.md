@@ -128,15 +128,18 @@ No simulation software is used; the prototype is a physical test setup.
 ## Repository structure
 
 ```
-src/master/       master controller firmware   (pio run -e master)
-src/slave/        slave controller firmware    (pio run -e slave)
-src/basics/       practice sketches            (pio run -e blink / -e mac_address)
-lib/VriConfig/    shared hardware config (board MAC addresses)
+src/master/       master firmware, fixed-timing cycle   (pio run -e master)
+src/slave/        slave firmware, both slaves           (pio run -e slave)
+src/basics/       practice sketches and hardware test tools, one environment each
+lib/VriConfig/    shared hardware config (board MACs, pin tables, timing)
+lib/VriProtocol/  ESP-NOW message definitions shared by master and slave
 include/          project-wide headers
 test/             PlatformIO unit tests
-docs/             functional design, getting started
-platformio.ini    build environments (shared [env] + master, slave, blink, mac_address)
+docs/             functional and technical design, wiring check, getting started
+platformio.ini    build environments (shared [env] + master, slave and one per sketch)
 ```
+
+Both slaves run the same firmware: a slave picks its pin table by its own MAC address.
 
 ## Getting started
 
