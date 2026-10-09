@@ -22,9 +22,14 @@ const SlaveRole ROLES[] = {
 static const SlaveRole *role = nullptr;
 static const SignalHeadPins *heads = nullptr;
 static int headCount = 0;
-static volatile unsigned long lastMessageAt = 0;
-static volatile bool hasHeardMaster = false;
+
+// The receive callback runs in the Wi-Fi task. It only copies the message;
+// loop() does the work. The spinlock stops loop() from reading a half-written
+// message when a new one arrives on the other core.
 static SignalMessage latestMessage;
+static unsigned long lastMessageAt = 0;
+static bool hasHeardMaster = false;
+static portMUX_TYPE messageLock = portMUX_INITIALIZER_UNLOCKED;
 static uint8_t ownMac[6];
 
 static void setAspect(const SignalHeadPins &head, uint8_t aspect) {
@@ -35,9 +40,12 @@ static void setAspect(const SignalHeadPins &head, uint8_t aspect) {
 
 static void handleMessage(const uint8_t *data, int len) {
   if (len != sizeof(SignalMessage) || data[0] != MESSAGE_MAGIC) return;
+  unsigned long now = millis();
+  portENTER_CRITICAL(&messageLock);
   memcpy(&latestMessage, data, sizeof(latestMessage));
-  lastMessageAt = millis();
+  lastMessageAt = now;
   hasHeardMaster = true;
+  portEXIT_CRITICAL(&messageLock);
 }
 
 #if ESP_ARDUINO_VERSION_MAJOR >= 3
@@ -116,7 +124,17 @@ void loop() {
 
   static bool wasFailSafe = true;
   static uint8_t lastPhase = 0xFF;
-  bool failSafe = !hasHeardMaster || millis() - lastMessageAt > MASTER_TIMEOUT_MS;
+
+  SignalMessage message;
+  unsigned long messageAt;
+  bool heardMaster;
+  portENTER_CRITICAL(&messageLock);
+  memcpy(&message, &latestMessage, sizeof(message));
+  messageAt = lastMessageAt;
+  heardMaster = hasHeardMaster;
+  portEXIT_CRITICAL(&messageLock);
+
+  bool failSafe = !heardMaster || millis() - messageAt > MASTER_TIMEOUT_MS;
 
   if (failSafe) {
     // No master -> flashing orange, like a real intersection on a fault
@@ -129,11 +147,6 @@ void loop() {
 
   if (wasFailSafe) Serial.println("Master found");
   wasFailSafe = false;
-
-  SignalMessage message;
-  noInterrupts();
-  memcpy(&message, &latestMessage, sizeof(message));
-  interrupts();
 
   for (int i = 0; i < headCount; i++) setAspect(heads[i], message.aspects[heads[i].id]);
 
