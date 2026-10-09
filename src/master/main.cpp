@@ -3,13 +3,8 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <esp_now.h>
+#include <VriConfig.h>
 #include <VriProtocol.h>
-
-// ---- Tijden (ms) ----
-const unsigned long GROEN_TIJD   = 7000;
-const unsigned long GEEL_TIJD    = 3000;
-const unsigned long ALLROOD_TIJD = 2000;  // ontruimingstijd tussen fases
-const unsigned long START_ROOD   = 3000;  // alles rood na opstarten
 
 // ---- Fases: welke lichten tegelijk groen mogen ----
 // Per fase steeds 1 weg, beide richtingen (A+B) van dezelfde baan -> geen conflicten.
@@ -35,7 +30,7 @@ const uint8_t BROADCAST[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 int fase = AANTAL_FASES - 1;  // eerste ALLROOD gaat door naar fase 0
 Stap stap = STAP_ALLROOD;
 unsigned long stapStart = 0;
-unsigned long stapDuur = START_ROOD;
+unsigned long stapDuur = STARTUP_ALL_RED_MS;
 unsigned long laatsteVerzonden = 0;
 
 void verstuur() {
@@ -88,18 +83,18 @@ void loop() {
   if (millis() - stapStart >= stapDuur) {
     switch (stap) {
       case STAP_GROEN:
-        naarStap(STAP_GEEL, GEEL_TIJD);
+        naarStap(STAP_GEEL, ORANGE_MS);
         break;
       case STAP_GEEL:
-        naarStap(STAP_ALLROOD, ALLROOD_TIJD);
+        naarStap(STAP_ALLROOD, CLEARANCE_MS);
         break;
       case STAP_ALLROOD:
         fase = (fase + 1) % AANTAL_FASES;
-        naarStap(STAP_GROEN, GROEN_TIJD);
+        naarStap(STAP_GROEN, FIXED_GREEN_MS);
         break;
     }
   }
 
   // Blijf herhalen zodat een (her)opstartende slave meteen weer meedoet
-  if (millis() - laatsteVerzonden >= VERSTUUR_INTERVAL) verstuur();
+  if (millis() - laatsteVerzonden >= SEND_INTERVAL_MS) verstuur();
 }

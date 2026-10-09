@@ -19,8 +19,3 @@ struct __attribute__((packed)) LichtBericht {
   uint8_t fase;                   // alleen voor debug
   uint8_t kleur[AANTAL_LICHTEN];  // Kleur per licht
 };
-
-// Master stuurt dit elke VERSTUUR_INTERVAL ms opnieuw.
-// Hoort een slave langer dan TIMEOUT_MS niets -> knipperend geel (storing).
-const unsigned long VERSTUUR_INTERVAL = 100;
-const unsigned long TIMEOUT_MS = 1500;
