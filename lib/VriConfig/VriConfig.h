@@ -20,27 +20,27 @@
 
 // The red, orange and green LED of one signal head. Pin HIGH = LED on.
 struct SignalHeadPins {
-  LichtId id;
+  SignalHeadId id;
   const char *name;
   uint8_t red, orange, green;
 };
 
 // Checked per LED on the intersection with pin scan (2026-10-08).
-//                                  id           name        red orange green
+// {id,           name,       red, orange, green}
 const SignalHeadPins MAIN_ROAD_PINS[] = {
-  {HW_A_LINKS,  "A links",   18,  13,  14},
-  {HW_A_RECHTS, "A rechts",  19,  21,  22},  // red 19 unconfirmed: not seen in the test
-  {HW_B_LINKS,  "B links",   27,  32,  26},
-  {HW_B_RECHTS, "B rechts",  25,  33,  23},
+  {MAIN_A_LEFT,  "A left",    18,  13,  14},
+  {MAIN_A_RIGHT, "A right",   19,  21,  22},  // red 19 unconfirmed: not seen in the test
+  {MAIN_B_LEFT,  "B left",    27,  32,  26},
+  {MAIN_B_RIGHT, "B right",   25,  33,  23},
 };
 
 // Side road A left red (32) and A right orange (13) did not light up visibly in
 // the test; they are the only pins left and the LED voltage measurement fits.
 const SignalHeadPins SIDE_ROAD_PINS[] = {
-  {ZW_A_LINKS,  "A links",   32,  33,  27},
-  {ZW_A_RECHTS, "A rechts",  14,  13,  26},
-  {ZW_B_LINKS,  "B links",   25,  23,  22},
-  {ZW_B_RECHTS, "B rechts",  21,  18,  19},
+  {SIDE_A_LEFT,  "A left",    32,  33,  27},
+  {SIDE_A_RIGHT, "A right",   14,  13,  26},
+  {SIDE_B_LEFT,  "B left",    25,  23,  22},
+  {SIDE_B_RIGHT, "B right",   21,  18,  19},
 };
 
 // Every LED pin used on both slaves, for the test tools and for keeping all
@@ -59,3 +59,7 @@ const unsigned long STARTUP_ALL_RED_MS = 3000;  // all red after start-up
 // nothing for MASTER_TIMEOUT_MS flashes orange (fail-safe).
 const unsigned long SEND_INTERVAL_MS  = 100;
 const unsigned long MASTER_TIMEOUT_MS = 1500;
+
+// A slave with an unknown MAC repeats its error, so it is also seen when the
+// serial monitor is opened after boot.
+const unsigned long UNKNOWN_MAC_REPEAT_MS = 5000;

@@ -1,4 +1,4 @@
-// ALLESAAN: test - alle 12 lampjes (rood, geel, groen van alle 4 lichten) continu aan.
+// ALL ON: test - all 12 LEDs (red, orange and green of all 4 signal heads) stay on.
 #include <Arduino.h>
 #include <VriConfig.h>
 

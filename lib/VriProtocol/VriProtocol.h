@@ -1,21 +1,21 @@
 #pragma once
 #include <stdint.h>
 
-// Gedeeld tussen master en slaves: wat er over ESP-NOW gaat.
+// Shared by master and slaves: what goes over ESP-NOW.
 
-enum Kleur : uint8_t { UIT = 0, ROOD = 1, GEEL = 2, GROEN = 3 };
+enum Aspect : uint8_t { ASPECT_OFF = 0, ASPECT_RED = 1, ASPECT_ORANGE = 2, ASPECT_GREEN = 3 };
 
-// Alle 8 lichten van het kruispunt (namen zoals in "waarnemingen kruispunt.xlsx")
-enum LichtId : uint8_t {
-  HW_A_LINKS, HW_A_RECHTS, HW_B_LINKS, HW_B_RECHTS,  // slave hoofdweg
-  ZW_A_LINKS, ZW_A_RECHTS, ZW_B_LINKS, ZW_B_RECHTS,  // slave zijweg
-  AANTAL_LICHTEN
+// All 8 signal heads of the intersection
+enum SignalHeadId : uint8_t {
+  MAIN_A_LEFT, MAIN_A_RIGHT, MAIN_B_LEFT, MAIN_B_RIGHT,  // main road slave
+  SIDE_A_LEFT, SIDE_A_RIGHT, SIDE_B_LEFT, SIDE_B_RIGHT,  // side road slave
+  SIGNAL_HEAD_COUNT
 };
 
-const uint8_t BERICHT_MAGIC = 0x4B;  // 'K' - negeer vreemde ESP-NOW pakketjes
+const uint8_t MESSAGE_MAGIC = 0x4B;  // 'K' - ignore other ESP-NOW packets
 
-struct __attribute__((packed)) LichtBericht {
+struct __attribute__((packed)) SignalMessage {
   uint8_t magic;
-  uint8_t fase;                   // alleen voor debug
-  uint8_t kleur[AANTAL_LICHTEN];  // Kleur per licht
+  uint8_t phase;                       // for debugging only
+  uint8_t aspects[SIGNAL_HEAD_COUNT];  // Aspect per signal head
 };

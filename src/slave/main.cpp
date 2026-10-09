@@ -10,47 +10,45 @@
 struct SlaveRole {
   uint8_t mac[6];
   const char *title;
-  const SignalHeadPins *lights;
-  int lightCount;
+  const SignalHeadPins *heads;
+  int headCount;
 };
 
 const SlaveRole ROLES[] = {
-  {MAC_SLAVE_MAIN_ROAD, "HOOFDWEG", MAIN_ROAD_PINS, sizeof(MAIN_ROAD_PINS) / sizeof(MAIN_ROAD_PINS[0])},
-  {MAC_SLAVE_SIDE_ROAD, "ZIJWEG",   SIDE_ROAD_PINS,   sizeof(SIDE_ROAD_PINS) / sizeof(SIDE_ROAD_PINS[0])},
+  {MAC_SLAVE_MAIN_ROAD, "MAIN ROAD", MAIN_ROAD_PINS, sizeof(MAIN_ROAD_PINS) / sizeof(MAIN_ROAD_PINS[0])},
+  {MAC_SLAVE_SIDE_ROAD, "SIDE ROAD", SIDE_ROAD_PINS, sizeof(SIDE_ROAD_PINS) / sizeof(SIDE_ROAD_PINS[0])},
 };
 
-// Repeat the error, so it is also seen when the monitor is opened after boot.
-const unsigned long UNKNOWN_MAC_REPEAT_MS = 5000;
-
-static const SignalHeadPins *gLichten = nullptr;
-static int gAantal = 0;
-static volatile unsigned long gLaatsteBericht = 0;
-static volatile bool gOoitOntvangen = false;
-static LichtBericht gBericht;
+static const SlaveRole *role = nullptr;
+static const SignalHeadPins *heads = nullptr;
+static int headCount = 0;
+static volatile unsigned long lastMessageAt = 0;
+static volatile bool hasHeardMaster = false;
+static SignalMessage latestMessage;
 static uint8_t ownMac[6];
 
-static void zetKleur(const SignalHeadPins &l, uint8_t k) {
-  digitalWrite(l.red, k == ROOD);
-  digitalWrite(l.orange, k == GEEL);
-  digitalWrite(l.green, k == GROEN);
+static void setAspect(const SignalHeadPins &head, uint8_t aspect) {
+  digitalWrite(head.red, aspect == ASPECT_RED);
+  digitalWrite(head.orange, aspect == ASPECT_ORANGE);
+  digitalWrite(head.green, aspect == ASPECT_GREEN);
 }
 
-static void verwerk(const uint8_t *data, int len) {
-  if (len != sizeof(LichtBericht) || data[0] != BERICHT_MAGIC) return;
-  memcpy(&gBericht, data, sizeof(gBericht));
-  gLaatsteBericht = millis();
-  gOoitOntvangen = true;
+static void handleMessage(const uint8_t *data, int len) {
+  if (len != sizeof(SignalMessage) || data[0] != MESSAGE_MAGIC) return;
+  memcpy(&latestMessage, data, sizeof(latestMessage));
+  lastMessageAt = millis();
+  hasHeardMaster = true;
 }
 
 #if ESP_ARDUINO_VERSION_MAJOR >= 3
-static void onRecv(const esp_now_recv_info_t *, const uint8_t *data, int len) { verwerk(data, len); }
+static void onReceive(const esp_now_recv_info_t *, const uint8_t *data, int len) { handleMessage(data, len); }
 #else
-static void onRecv(const uint8_t *, const uint8_t *data, int len) { verwerk(data, len); }
+static void onReceive(const uint8_t *, const uint8_t *data, int len) { handleMessage(data, len); }
 #endif
 
 static const SlaveRole *findRole(const uint8_t *mac) {
-  for (const SlaveRole &role : ROLES) {
-    if (memcmp(role.mac, mac, 6) == 0) return &role;
+  for (const SlaveRole &candidate : ROLES) {
+    if (memcmp(candidate.mac, mac, 6) == 0) return &candidate;
   }
   return nullptr;
 }
@@ -70,60 +68,6 @@ static void printUnknownMac() {
                 ownMac[0], ownMac[1], ownMac[2], ownMac[3], ownMac[4], ownMac[5]);
 }
 
-static void slaveSetup(const char *titel, const SignalHeadPins *lichten, int aantal) {
-  gLichten = lichten;
-  gAantal = aantal;
-  Serial.printf("\n=== Kruispunt SLAVE %s ===\n", titel);
-
-  for (int i = 0; i < aantal; i++) {
-    pinMode(lichten[i].red, OUTPUT);
-    pinMode(lichten[i].orange, OUTPUT);
-    pinMode(lichten[i].green, OUTPUT);
-    zetKleur(lichten[i], UIT);
-  }
-
-  Serial.print("MAC: ");
-  Serial.println(WiFi.macAddress());
-  if (esp_now_init() != ESP_OK) {
-    Serial.println("ESP-NOW init mislukt, herstart...");
-    delay(1000);
-    ESP.restart();
-  }
-  esp_now_register_recv_cb(onRecv);
-}
-
-static void slaveLoop() {
-  static bool wasStoring = true;
-  static uint8_t vorigeFase = 0xFF;
-  bool storing = !gOoitOntvangen || millis() - gLaatsteBericht > MASTER_TIMEOUT_MS;
-
-  if (storing) {
-    // Geen master -> knipperend geel, zoals een echt kruispunt bij storing
-    bool aan = (millis() / 500) % 2;
-    for (int i = 0; i < gAantal; i++) zetKleur(gLichten[i], aan ? GEEL : UIT);
-    if (!wasStoring) Serial.println("Geen signaal van master -> knipperend geel");
-    wasStoring = true;
-    return;
-  }
-
-  if (wasStoring) Serial.println("Master gevonden");
-  wasStoring = false;
-
-  LichtBericht b;
-  noInterrupts();
-  memcpy(&b, &gBericht, sizeof(b));
-  interrupts();
-
-  for (int i = 0; i < gAantal; i++) zetKleur(gLichten[i], b.kleur[gLichten[i].id]);
-
-  if (b.fase != vorigeFase) {
-    vorigeFase = b.fase;
-    Serial.printf("Fase %d\n", b.fase);
-  }
-}
-
-static const SlaveRole *role = nullptr;
-
 void setup() {
   Serial.begin(115200);
   delay(200);
@@ -138,7 +82,26 @@ void setup() {
     printUnknownMac();
     return;
   }
-  slaveSetup(role->title, role->lights, role->lightCount);
+
+  heads = role->heads;
+  headCount = role->headCount;
+  Serial.printf("\n=== Intersection SLAVE %s ===\n", role->title);
+
+  for (int i = 0; i < headCount; i++) {
+    pinMode(heads[i].red, OUTPUT);
+    pinMode(heads[i].orange, OUTPUT);
+    pinMode(heads[i].green, OUTPUT);
+    setAspect(heads[i], ASPECT_OFF);
+  }
+
+  Serial.print("MAC: ");
+  Serial.println(WiFi.macAddress());
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("ESP-NOW init failed, restarting...");
+    delay(1000);
+    ESP.restart();
+  }
+  esp_now_register_recv_cb(onReceive);
 }
 
 void loop() {
@@ -150,5 +113,32 @@ void loop() {
     }
     return;
   }
-  slaveLoop();
+
+  static bool wasFailSafe = true;
+  static uint8_t lastPhase = 0xFF;
+  bool failSafe = !hasHeardMaster || millis() - lastMessageAt > MASTER_TIMEOUT_MS;
+
+  if (failSafe) {
+    // No master -> flashing orange, like a real intersection on a fault
+    bool orangeOn = (millis() / 500) % 2;
+    for (int i = 0; i < headCount; i++) setAspect(heads[i], orangeOn ? ASPECT_ORANGE : ASPECT_OFF);
+    if (!wasFailSafe) Serial.println("No signal from master -> flashing orange");
+    wasFailSafe = true;
+    return;
+  }
+
+  if (wasFailSafe) Serial.println("Master found");
+  wasFailSafe = false;
+
+  SignalMessage message;
+  noInterrupts();
+  memcpy(&message, &latestMessage, sizeof(message));
+  interrupts();
+
+  for (int i = 0; i < headCount; i++) setAspect(heads[i], message.aspects[heads[i].id]);
+
+  if (message.phase != lastPhase) {
+    lastPhase = message.phase;
+    Serial.printf("Phase %d\n", message.phase);
+  }
 }

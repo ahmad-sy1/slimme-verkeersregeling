@@ -1,6 +1,6 @@
-// Loopt elk licht af (rood, geel, groen) en print welke GPIO aan staat.
-// Klopt de print niet met wat je ziet? Pas de pin-tabel in VriConfig.h aan.
-// The board picks its pin table by MAC address, like the slave firmware.
+// SIGNAL HEAD TEST: walks every signal head (red, orange, green) and prints
+// which GPIO is on. Does the output not match what you see? Fix the pin table
+// in VriConfig.h. The board picks its pin table by MAC address, like the slave.
 #include <Arduino.h>
 #include <WiFi.h>
 #include <VriConfig.h>
@@ -9,22 +9,22 @@
 struct SlaveRole {
   uint8_t mac[6];
   const char *title;
-  const SignalHeadPins *lights;
-  int lightCount;
+  const SignalHeadPins *heads;
+  int headCount;
 };
 
 const SlaveRole ROLES[] = {
-  {MAC_SLAVE_MAIN_ROAD, "HOOFDWEG", MAIN_ROAD_PINS, sizeof(MAIN_ROAD_PINS) / sizeof(MAIN_ROAD_PINS[0])},
-  {MAC_SLAVE_SIDE_ROAD, "ZIJWEG",   SIDE_ROAD_PINS, sizeof(SIDE_ROAD_PINS) / sizeof(SIDE_ROAD_PINS[0])},
+  {MAC_SLAVE_MAIN_ROAD, "MAIN ROAD", MAIN_ROAD_PINS, sizeof(MAIN_ROAD_PINS) / sizeof(MAIN_ROAD_PINS[0])},
+  {MAC_SLAVE_SIDE_ROAD, "SIDE ROAD", SIDE_ROAD_PINS, sizeof(SIDE_ROAD_PINS) / sizeof(SIDE_ROAD_PINS[0])},
 };
 
-static const SignalHeadPins *gLichten = nullptr;
-static int gAantal = 0;
+static const SignalHeadPins *heads = nullptr;
+static int headCount = 0;
 
-static void zetKleur(const SignalHeadPins &l, uint8_t k) {
-  digitalWrite(l.red, k == ROOD);
-  digitalWrite(l.orange, k == GEEL);
-  digitalWrite(l.green, k == GROEN);
+static void setAspect(const SignalHeadPins &head, uint8_t aspect) {
+  digitalWrite(head.red, aspect == ASPECT_RED);
+  digitalWrite(head.orange, aspect == ASPECT_ORANGE);
+  digitalWrite(head.green, aspect == ASPECT_GREEN);
 }
 
 void setup() {
@@ -42,8 +42,8 @@ void setup() {
   WiFi.macAddress(mac);
   for (const SlaveRole &role : ROLES) {
     if (memcmp(role.mac, mac, 6) == 0) {
-      gLichten = role.lights;
-      gAantal = role.lightCount;
+      heads = role.heads;
+      headCount = role.headCount;
       Serial.printf("\n=== PIN TEST %s ===\n", role.title);
       return;
     }
@@ -54,18 +54,18 @@ void setup() {
 }
 
 void loop() {
-  if (gLichten == nullptr) return;
+  if (heads == nullptr) return;
 
-  const char *kleurNaam[] = {"", "ROOD ", "GEEL ", "GROEN"};
-  for (int i = 0; i < gAantal; i++) {
-    const SignalHeadPins &l = gLichten[i];
-    uint8_t pins[] = {0, l.red, l.orange, l.green};
-    for (uint8_t k = ROOD; k <= GROEN; k++) {
-      Serial.printf("%-10s %s  -> GPIO%d\n", l.name, kleurNaam[k], pins[k]);
-      zetKleur(l, k);
+  const char *ASPECT_NAMES[] = {"", "RED   ", "ORANGE", "GREEN "};
+  for (int i = 0; i < headCount; i++) {
+    const SignalHeadPins &head = heads[i];
+    uint8_t pins[] = {0, head.red, head.orange, head.green};
+    for (uint8_t aspect = ASPECT_RED; aspect <= ASPECT_GREEN; aspect++) {
+      Serial.printf("%-10s %s  -> GPIO%d\n", head.name, ASPECT_NAMES[aspect], pins[aspect]);
+      setAspect(head, aspect);
       delay(2000);
     }
-    zetKleur(l, UIT);
+    setAspect(head, ASPECT_OFF);
   }
-  Serial.println("--- opnieuw ---");
+  Serial.println("--- again ---");
 }

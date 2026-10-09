@@ -1,6 +1,6 @@
-// LEDMETING: meet per pin de spanning over het lampje bij een heel klein stroompje
-// (interne pull-up ~45k). Rood ~1.6V < geel ~1.8V < groen ~1.9-2.6V.
-// Geen lampje / los draadje -> ~3V. Alleen pinnen met ADC kunnen gemeten worden.
+// LED VOLTAGE: measures per pin the voltage over the LED at a very small current
+// (internal pull-up ~45k). Red ~1.6V < orange ~1.8V < green ~1.9-2.6V.
+// No LED / loose wire -> ~3V. Only pins with an ADC can be measured.
 #include <Arduino.h>
 #include <driver/adc.h>
 #include <driver/rtc_io.h>
@@ -9,9 +9,9 @@
 
 esp_adc_cal_characteristics_t cal1, cal2;
 
-// -1 = geen ADC op deze pin
-int adc1Kanaal(int p) { return p == 32 ? ADC1_CHANNEL_4 : p == 33 ? ADC1_CHANNEL_5 : -1; }
-int adc2Kanaal(int p) {
+// -1 = no ADC on this pin
+int adc1Channel(int p) { return p == 32 ? ADC1_CHANNEL_4 : p == 33 ? ADC1_CHANNEL_5 : -1; }
+int adc2Channel(int p) {
   switch (p) {
     case 13: return ADC2_CHANNEL_4;
     case 14: return ADC2_CHANNEL_6;
@@ -22,25 +22,25 @@ int adc2Kanaal(int p) {
   return -1;
 }
 
-int meet(int p) {
-  int k1 = adc1Kanaal(p), k2 = adc2Kanaal(p);
+int measureMillivolts(int p) {
+  int k1 = adc1Channel(p), k2 = adc2Channel(p);
   if (k1 < 0 && k2 < 0) return -1;
   if (k1 >= 0) adc1_config_channel_atten((adc1_channel_t)k1, ADC_ATTEN_DB_12);
   else adc2_config_channel_atten((adc2_channel_t)k2, ADC_ATTEN_DB_12);
   rtc_gpio_pullup_en((gpio_num_t)p);
   delay(30);
-  uint32_t som = 0;
+  uint32_t sum = 0;
   for (int i = 0; i < 64; i++) {
     int raw = 0;
     if (k1 >= 0) raw = adc1_get_raw((adc1_channel_t)k1);
     else adc2_get_raw((adc2_channel_t)k2, ADC_WIDTH_BIT_12, &raw);
-    som += esp_adc_cal_raw_to_voltage(raw, k1 >= 0 ? &cal1 : &cal2);
+    sum += esp_adc_cal_raw_to_voltage(raw, k1 >= 0 ? &cal1 : &cal2);
   }
   rtc_gpio_pullup_dis((gpio_num_t)p);
   rtc_gpio_deinit((gpio_num_t)p);
   pinMode(p, OUTPUT);
   digitalWrite(p, LOW);
-  return som / 64;
+  return sum / 64;
 }
 
 void setup() {
@@ -55,8 +55,8 @@ void setup() {
 }
 
 void loop() {
-  Serial.print("METING");
-  for (int p : SLAVE_LED_PINS) Serial.printf(" %d=%d", p, meet(p));
+  Serial.print("MEASUREMENT");
+  for (int p : SLAVE_LED_PINS) Serial.printf(" %d=%d", p, measureMillivolts(p));
   Serial.println();
   delay(1000);
 }
