@@ -158,41 +158,44 @@ Two hardware constraints drive this mapping:
 - **Avoid strapping and flash pins** (GPIO 0, 2, 5, 12, 15 and 6–11) for LEDs, so the
   boards boot reliably regardless of what is connected.
 
-### Signal head numbering and conflicts (unconfirmed)
+### Signal head numbering
 
-An earlier design numbered the 8 signal heads of the intersection:
+Every pole of the intersection carries a number: the `SignalHeadId` order in
+`VriProtocol.h` plus one. The numbers were put on the poles on 2026-10-09 (see the
+[wiring check](wiring-check.md#pole-numbering)).
 
-| No. | Signal head |
+| No. | `SignalHeadId` | Slave |
+|---|---|---|
+| 1 | `MAIN_A_LEFT` | Main road |
+| 2 | `MAIN_A_RIGHT` | Main road |
+| 3 | `MAIN_B_LEFT` | Main road |
+| 4 | `MAIN_B_RIGHT` | Main road |
+| 5 | `SIDE_A_LEFT` | Side road |
+| 6 | `SIDE_A_RIGHT` | Side road |
+| 7 | `SIDE_B_LEFT` | Side road |
+| 8 | `SIDE_B_RIGHT` | Side road |
+
+### Conflicts from the earlier design (unconfirmed)
+
+An earlier design listed which signal heads may be green together. It named the two
+side road approaches "right" and "left" instead of A and B, and how its signal heads map
+onto the numbered poles is **unconfirmed**, so the table keeps its own names:
+
+| Signal head (earlier design) | May be green together with |
 |---|---|
-| 1 | Main road B, left |
-| 2 | Main road B, right |
-| 3 | Side road "right", left |
-| 4 | Side road "right", right |
-| 5 | Main road A, left |
-| 6 | Main road A, right |
-| 7 | Side road "left", left |
-| 8 | Side road "left", right |
+| Main A left | Main A right, Main B left, Side "right" right, Side "left" right |
+| Main A right | Main A left, Main B right, Side "right" right |
+| Main B left | Main A left, Main B right, Side "right" right, Side "left" right |
+| Main B right | Main A right, Main B left, Side "left" right |
+| Side "right" left | Side "right" right, Side "left" right |
+| Side "right" right | Main A left, Main A right, Main B left, Side "right" left, Side "left" right |
+| Side "left" left | Side "right" right, Side "left" right |
+| Side "left" right | Main A left, Main B left, Main B right, Side "right" left, Side "right" right, Side "left" left |
 
-**Unconfirmed:** this numbering uses "side road left/right" for the two side road
-approaches, while the current code uses side road A and B. How the two map onto each
-other is not known.
-
-The same design listed which signal heads may be green together:
-
-| No. | May be green together with |
-|---|---|
-| 1 | 2, 4, 5, 8 |
-| 2 | 1, 6, 8 |
-| 3 | 4, 8 |
-| 4 | 1, 3, 5, 6, 8 |
-| 5 | 1, 4, 6, 8 |
-| 6 | 2, 4, 5 |
-| 7 | 4, 8 |
-| 8 | 1, 2, 3, 4, 5, 7 |
-
-**Inconsistent:** 7 lists 4 as allowed, but 4 does not list 7. The table must be
-corrected and confirmed before it is used for the conflict guard (US-18.04). The
-current fixed-timing cycle does not use it.
+**Inconsistent:** Side "left" left lists Side "right" right as allowed, but Side "right"
+right does not list Side "left" left. The table must be corrected, mapped onto the pole
+numbers and confirmed before it is used for the conflict guard (US-18.04). The current
+fixed-timing cycle does not use it.
 
 ### Vehicle detection
 
@@ -626,7 +629,7 @@ own MAC address at startup, so there is only one slave build environment.
 | 6 | How is time of day provided for peak and off-peak programs (NTP, serial, button)? | US-08 |
 | 7 | Final pin mapping: confirm the two unconfirmed LEDs and choose the LDR pins | All hardware stories |
 | 8 | Before the first message from the master, should a slave flash orange (current behaviour) or show red? | US-02 |
-| 9 | Which signal heads may be green together? The conflict table in section 2 is inconsistent | US-18.04 |
+| 9 | Which signal heads may be green together? The conflict table in section 2 is inconsistent and not mapped onto the pole numbers | US-18.04 |
 
 When a decision is made, it is recorded in [`decisions.md`](decisions.md) and this
 document is updated.
