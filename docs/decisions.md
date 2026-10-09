@@ -42,6 +42,44 @@ revisiting later.
 
 ---
 
+## DEC-03 ESP-NOW for communication between master and slaves
+
+| | |
+|---|---|
+| **Date** | 2026-09-11 |
+| **Status** | Accepted |
+| **Decided by** | *Ahmad Alasmi, Stijn Reits, Osama Alasmi, Vic Theunissen* |
+| **Affects** | US-09, US-10, US-18 |
+
+**Context**
+The master must send commands to the slaves and get their status back. The connection
+must be wireless, fast, and work without the school network. If the connection is lost,
+the system must notice it so it can switch to a safe state (BR-05).
+
+**Options considered**
+
+| Option | Pros | Cons |
+|---|---|---|
+| ESP-NOW | Built into the ESP32; no router needed; fast | Only works on ESP32; max 250 bytes per message |
+| Wi-Fi via a router | Well-known; can also be used for the dashboard | Needs a router or the school network; slower; more can go wrong |
+| Wires (UART / I2C) | Very reliable | Not wireless; extra cables between the boards |
+
+**Decision**
+Master and slaves communicate over ESP-NOW.
+
+**Reasoning**
+ESP-NOW is wireless and does not need any network, so it works the same in class and
+at the demo. Our practice sketches showed that it works and that the sender can see
+whether a message arrived.
+
+**Consequences**
+- All slaves must be ESP32 boards; an Arduino cannot be used.
+- The MAC address of every board is stored in `lib/VriConfig/VriConfig.h`.
+- Messages must be smaller than 250 bytes.
+- A message can get lost, so both sides use a timeout to detect a lost connection.
+
+---
+
 ## DEC-02 Documentation and naming in English
 
 | | |
