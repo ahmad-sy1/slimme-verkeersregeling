@@ -196,6 +196,7 @@ NOT DISCUSSED YET
 |---|---|
 | [`docs/functional-design.md`](docs/functional-design.md) | User stories with acceptance criteria |
 | [`docs/technical-design.md`](docs/technical-design.md) | Architecture, state machine, data model, schematics |
+| [`docs/wiring-check.md`](docs/wiring-check.md) | Pin mapping checked on the intersection, board MACs, LED voltage measurement |
 | [`docs/test-plan.md`](docs/test-plan.md) | Test approach and test scenarios |
 | [`docs/tests/`](docs/tests/) | Test reports per sprint |
 | [`docs/decisions.md`](docs/decisions.md) | Decisions made and the reasoning behind them |
