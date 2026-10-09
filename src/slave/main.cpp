@@ -70,38 +70,6 @@ static void printUnknownMac() {
                 ownMac[0], ownMac[1], ownMac[2], ownMac[3], ownMac[4], ownMac[5]);
 }
 
-#ifdef PINTEST
-// Loopt elk licht af (rood, geel, groen) en print welke GPIO aan staat.
-// Klopt de print niet met wat je ziet? Pas de pin-tabel aan.
-static void slaveSetup(const char *titel, const SignalHeadPins *lichten, int aantal) {
-  gLichten = lichten;
-  gAantal = aantal;
-  Serial.printf("\n=== PIN TEST %s ===\n", titel);
-  for (int i = 0; i < aantal; i++) {
-    pinMode(lichten[i].red, OUTPUT);
-    pinMode(lichten[i].orange, OUTPUT);
-    pinMode(lichten[i].green, OUTPUT);
-    zetKleur(lichten[i], UIT);
-  }
-}
-
-static void slaveLoop() {
-  const char *kleurNaam[] = {"", "ROOD ", "GEEL ", "GROEN"};
-  for (int i = 0; i < gAantal; i++) {
-    const SignalHeadPins &l = gLichten[i];
-    uint8_t pins[] = {0, l.red, l.orange, l.green};
-    for (uint8_t k = ROOD; k <= GROEN; k++) {
-      Serial.printf("%-10s %s  -> GPIO%d\n", l.name, kleurNaam[k], pins[k]);
-      zetKleur(l, k);
-      delay(2000);
-    }
-    zetKleur(l, UIT);
-  }
-  Serial.println("--- opnieuw ---");
-}
-
-#else
-
 static void slaveSetup(const char *titel, const SignalHeadPins *lichten, int aantal) {
   gLichten = lichten;
   gAantal = aantal;
@@ -153,7 +121,6 @@ static void slaveLoop() {
     Serial.printf("Fase %d\n", b.fase);
   }
 }
-#endif
 
 static const SlaveRole *role = nullptr;
 

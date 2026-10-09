@@ -5,9 +5,7 @@
 #include <driver/adc.h>
 #include <driver/rtc_io.h>
 #include <esp_adc_cal.h>
-
-const int leds[] = {13, 14, 18, 19, 21, 22, 23, 25, 26, 27, 32, 33};
-const int aantal = sizeof(leds) / sizeof(leds[0]);
+#include <VriConfig.h>
 
 esp_adc_cal_characteristics_t cal1, cal2;
 
@@ -27,8 +25,8 @@ int adc2Kanaal(int p) {
 int meet(int p) {
   int k1 = adc1Kanaal(p), k2 = adc2Kanaal(p);
   if (k1 < 0 && k2 < 0) return -1;
-  if (k1 >= 0) adc1_config_channel_atten((adc1_channel_t)k1, ADC_ATTEN_DB_11);
-  else adc2_config_channel_atten((adc2_channel_t)k2, ADC_ATTEN_DB_11);
+  if (k1 >= 0) adc1_config_channel_atten((adc1_channel_t)k1, ADC_ATTEN_DB_12);
+  else adc2_config_channel_atten((adc2_channel_t)k2, ADC_ATTEN_DB_12);
   rtc_gpio_pullup_en((gpio_num_t)p);
   delay(30);
   uint32_t som = 0;
@@ -47,18 +45,18 @@ int meet(int p) {
 
 void setup() {
   Serial.begin(115200);
-  for (int p : leds) {
+  for (int p : SLAVE_LED_PINS) {
     pinMode(p, OUTPUT);
     digitalWrite(p, LOW);
   }
   adc1_config_width(ADC_WIDTH_BIT_12);
-  esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &cal1);
-  esp_adc_cal_characterize(ADC_UNIT_2, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &cal2);
+  esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_12, ADC_WIDTH_BIT_12, 1100, &cal1);
+  esp_adc_cal_characterize(ADC_UNIT_2, ADC_ATTEN_DB_12, ADC_WIDTH_BIT_12, 1100, &cal2);
 }
 
 void loop() {
   Serial.print("METING");
-  for (int p : leds) Serial.printf(" %d=%d", p, meet(p));
+  for (int p : SLAVE_LED_PINS) Serial.printf(" %d=%d", p, meet(p));
   Serial.println();
   delay(1000);
 }
