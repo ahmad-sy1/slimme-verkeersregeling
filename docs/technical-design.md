@@ -124,7 +124,7 @@ The LED pins below were checked on the intersection (see the
 | Signal head | Red | Orange | Green |
 |---|---|---|---|
 | A left | 18 | 13 | 14 |
-| A right | 19 (unconfirmed) | 21 | 22 |
+| A right | 19 | 21 | 22 |
 | B left | 27 | 32 | 26 |
 | B right | 25 | 33 | 23 |
 
@@ -624,7 +624,7 @@ own MAC address at startup, so there is only one slave build environment.
 | 4 | Maximum waiting time for the side road (client agreement) | US-07 |
 | 5 | Gap time value; add to the functional parameters | US-06 |
 | 6 | How is time of day provided for peak and off-peak programs (NTP, serial, button)? | US-08 |
-| 7 | Final pin mapping: confirm the three unconfirmed LEDs and choose the LDR pins | All hardware stories |
+| 7 | Final pin mapping: confirm the two unconfirmed LEDs and choose the LDR pins | All hardware stories |
 | 8 | Before the first message from the master, should a slave flash orange (current behaviour) or show red? | US-02 |
 | 9 | Which signal heads may be green together? The conflict table in section 2 is inconsistent | US-18.04 |
 

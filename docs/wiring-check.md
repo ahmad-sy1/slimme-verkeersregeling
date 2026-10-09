@@ -8,6 +8,7 @@ intersection, 2026-10-08. The pin tables below are the ones in
 - [Boards](#boards)
 - [Cycle](#cycle)
 - [Pins](#pins)
+- [Pole numbering](#pole-numbering)
 - [Points of attention](#points-of-attention)
 - [Lessons learned](#lessons-learned)
 - [LED voltage measurement](#led-voltage-measurement)
@@ -73,7 +74,7 @@ Checked on the intersection. Pins used on both slaves: 13, 14, 18, 19, 21, 22, 2
 | Signal head | Red | Orange | Green |
 |---|---|---|---|
 | A left | 18 | 13 | 14 |
-| A right | 19 (unconfirmed) | 21 | 22 |
+| A right | 19 | 21 | 22 |
 | B left | 27 | 32 | 26 |
 | B right | 25 | 33 | 23 |
 
@@ -98,14 +99,45 @@ With the pin scan firmware (`pin_scan`), 3 pins per board were switched on at a 
 | 3 | 23, 25, 26 | 23 B right green, 25 B right red, 26 B left green | 23 B left orange, 25 B left red, 26 A right green |
 | 4 | 27, 32, 33 | 27 B left red, 32 B left orange, 33 B right orange | 27 A left green, 32 nothing, 33 A left orange |
 
+## Pole numbering
+
+Every pole of the intersection carries a number: the `SignalHeadId` order in
+`VriProtocol.h` plus one.
+
+| No. | `SignalHeadId` | No. | `SignalHeadId` |
+|---|---|---|---|
+| 1 | `MAIN_A_LEFT` | 5 | `SIDE_A_LEFT` |
+| 2 | `MAIN_A_RIGHT` | 6 | `SIDE_A_RIGHT` |
+| 3 | `MAIN_B_LEFT` | 7 | `SIDE_B_LEFT` |
+| 4 | `MAIN_B_RIGHT` | 8 | `SIDE_B_RIGHT` |
+
+The numbers were put on the poles with `signal_head_test`: a number sent over the serial
+monitor switches on all three LEDs of that signal head. For every number we checked that
+exactly one pole lit up and which colours it showed, then put the number on that pole.
+
+### Main road (slave 1), 2026-10-09
+
+Board `94:B9:7E:D9:E3:D4`.
+
+| No. | Signal head | One pole only | Red | Orange | Green | Remark |
+|---|---|---|---|---|---|---|
+| 1 | Main road A left | yes | yes | yes | yes | Matches the pin table (red 18, orange 13, green 14) |
+| 2 | Main road A right | yes | yes | yes | yes | Matches the pin table (red 19, orange 21, green 22). Red on GPIO 19 now confirmed |
+| 3 | Main road B left | yes | yes | yes | yes | Matches the pin table (red 27, orange 32, green 26) |
+| 4 | Main road B right | yes | yes | yes | yes | Matches the pin table (red 25, orange 33, green 23) |
+
+### Side road (slave 2)
+
+Not checked yet.
+
 ## Points of attention
 
 - **Side road A left red (GPIO 32) and A right orange (GPIO 13)** did not light up
   visibly in any test. They are the only pins left for those LEDs, and the voltage
   measurement (below) shows that an LED is connected. Probably a loose wire, an LED
   the wrong way round or a very dim LED: check the wiring of these two.
-- **Main road A right red (GPIO 19)** was not reported in the test (a steady LED is easy
-  to miss), but it is the only pin left for that LED.
+- **Main road A right red (GPIO 19)** was not reported in the pin scan (a steady LED is
+  easy to miss). The pole numbering check of 2026-10-09 confirmed it.
 - "Left/right" follows the names used on the intersection. If the wrong two signal heads
   turn green together (for example A left with B right), swap the B left and B right
   rows in the pin table.
