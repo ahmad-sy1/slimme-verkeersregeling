@@ -91,7 +91,7 @@ logic; the slaves execute and report back.
 
 - **Master (ESP32)** — maintains the state machine, determines timing, processes
   detection events and priority requests, and feeds data to the dashboard.
-- **Slave (ESP32 / Arduino)** — switches the red, yellow and green LEDs for a single
+- **Slave (ESP32 / Arduino)** — switches the red, orange and green LEDs for a single
   approach and reports to the master whether vehicles are waiting.
 
 This split is deliberate: a single decision-maker makes it structurally impossible for
@@ -109,7 +109,7 @@ documented in [`docs/technical-design.md`](docs/technical-design.md).
 
 | Component | Represents |
 |---|---|
-| LED (red / yellow / green) | traffic light |
+| LED (red / orange / green) | traffic light |
 | LDR | vehicle detection |
 | Push button | emergency vehicle request and manual test input |
 | Serial input | repeatable test scenarios |
