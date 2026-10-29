@@ -20,3 +20,6 @@
 #define PIN_SCAN_BLINKS     5      // blinks per GPIO
 #define PIN_SCAN_BLINK_MS   300    // LED on and off time per blink
 #define PIN_SCAN_PAUSE_MS   3000   // pause between two GPIOs, time to note the pole
+
+// LED test (src/basics/led_test): blinks all PIN_SCAN_GPIOS together.
+#define LED_TEST_BLINK_MS   500    // LED on and off time
