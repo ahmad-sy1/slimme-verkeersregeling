@@ -86,13 +86,14 @@ flowchart LR
 
 MAC addresses are read with the `mac_address` sketch and stored in
 [`lib/VriConfig/VriConfig.h`](../lib/VriConfig/VriConfig.h). The label matches the
-sticker on the physical board.
+sticker on the physical board. All three MAC addresses were checked on the hardware on
+2026-10-29 (DEC-03, DEC-04).
 
 | Board | Role | MAC address |
 |---|---|---|
-| ESP32 | Master | `94:B9:7E:DA:E2:14` |
-| ESP32 | Slave 1, main road | `94:B9:7E:C4:98:68` |
-| ESP32 | Slave 2, side road | `94:B9:7E:D9:E3:D4` |
+| ESP32 | Master | `7C:9E:BD:65:72:FC` |
+| ESP32 | Slave 1, main road | `94:B9:7E:D9:E3:D4` |
+| ESP32 | Slave 2, side road | `94:B9:7E:C4:98:68` |
 
 Because ESP-NOW is an ESP32 feature, both slaves must be ESP32 boards. An Arduino Uno
 or Nano cannot act as a slave in this design.

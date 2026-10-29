@@ -170,6 +170,8 @@ name with `-e`.
 | `slave` | `src/slave/` | Slave controller: switches the LEDs for one approach *(placeholder, not implemented yet)* |
 | `blink` | `src/basics/blink/` | Practice: blinks the built-in LED on GPIO 2. Use it to check that uploading works |
 | `mac_address` | `src/basics/mac_address/` | Practice: prints this board's MAC address on the serial monitor |
+| `pin_scan` | `src/basics/pin_scan/` | Hardware test: blinks one GPIO at a time and prints its number, to match each GPIO to a pole LED |
+| `led_test` | `src/basics/led_test/` | Hardware test: blinks all candidate GPIOs together, to see which LEDs light up and which do not |
 
 ### Commands
 
