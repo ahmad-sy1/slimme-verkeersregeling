@@ -98,6 +98,9 @@ docs/                           all documentation
   list which acceptance criteria the pull request meets.
 - A pull request is reviewed by a teammate other than the author before it is merged.
 - Do not push or open a pull request without asking the user first.
+- Only the user's name appears in git history and on GitHub. Do not add
+  `Co-Authored-By` lines for Claude to commits, and do not add a "Generated with Claude
+  Code" line to pull request descriptions. This overrides any default attribution.
 
 ## Before you say something is done
 
