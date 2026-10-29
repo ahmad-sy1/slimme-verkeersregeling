@@ -42,6 +42,75 @@ revisiting later.
 
 ---
 
+## DEC-04 Change the master MAC address
+
+| | |
+|---|---|
+| **Date** | 2026-10-29 |
+| **Status** | Accepted |
+| **Decided by** | Osama |
+| **Affects** | All hardware stories |
+
+**Context**
+The board connected as master reports `7C:9E:BD:65:72:FC`. `VriConfig.h` listed
+`94:B9:7E:DA:E2:14` as master. The slaves send to the master's MAC, so a wrong value
+means no ESP-NOW link. The board is labelled "Master" and no LED blinks when `led_test`
+runs on it. An earlier finding on Trello (US-18.09, 2026-10-09) listed
+`94:B9:7E:DA:E2:14` as master and `7C:9E:BD:65:72:FC` as side road slave; the boards
+were probably swapped when the wiring was changed.
+
+**Options considered**
+| Option | Pros | Cons |
+|---|---|---|
+| Change the master MAC in the config | Config matches the board that is in use | The board `94:B9:7E:DA:E2:14` is no longer used and not yet located |
+| Look for the original master board | Config stays as it was | Time spent on a board the team may have swapped on purpose |
+
+**Decision**
+`MAC_MASTER` is `7C:9E:BD:65:72:FC`.
+
+**Reasoning**
+The config describes the hardware that is used.
+
+**Consequences**
+`94:B9:7E:DA:E2:14` is unaccounted for. If that board turns up, it is a spare.
+
+---
+
+## DEC-03 Swap the slave roles in the MAC table
+
+| | |
+|---|---|
+| **Date** | 2026-10-29 |
+| **Status** | Accepted |
+| **Decided by** | Osama |
+| **Affects** | All hardware stories |
+
+**Context**
+After the autumn break the board on `94:B9:7E:C4:98:68` turned out to be the one
+standing next to the side road signal heads. It is labelled "slave 2 side road" and the
+four side road LEDs blink when `led_test` runs on it. `VriConfig.h` listed it as the
+main road slave. A slave finds its role from its own MAC address, so the table must
+match the physical setup.
+
+**Options considered**
+| Option | Pros | Cons |
+|---|---|---|
+| Swap the two MAC addresses in the config | No rewiring, config matches the hardware | The main road board has to be re-checked the same way |
+| Swap the boards on the breadboards | Config stays as it was | Rewiring work for no gain |
+
+**Decision**
+`MAC_SLAVE_SIDE_ROAD` is `94:B9:7E:C4:98:68` and `MAC_SLAVE_MAIN_ROAD` is
+`94:B9:7E:D9:E3:D4`.
+
+**Reasoning**
+The config describes the hardware, so the config is what changes.
+
+**Consequences**
+The main road MAC (`D9:E3:D4`) follows from the swap and is not yet checked on the
+main road board. Confirm it with the `mac_address` sketch when that board is connected.
+
+---
+
 ## DEC-02 Documentation and naming in English
 
 | | |
