@@ -54,7 +54,10 @@ revisiting later.
 **Context**
 The board connected as master reports `7C:9E:BD:65:72:FC`. `VriConfig.h` listed
 `94:B9:7E:DA:E2:14` as master. The slaves send to the master's MAC, so a wrong value
-means no ESP-NOW link.
+means no ESP-NOW link. The board is labelled "Master" and no LED blinks when `led_test`
+runs on it. An earlier finding on Trello (US-18.09, 2026-10-09) listed
+`94:B9:7E:DA:E2:14` as master and `7C:9E:BD:65:72:FC` as side road slave; the boards
+were probably swapped when the wiring was changed.
 
 **Options considered**
 | Option | Pros | Cons |
@@ -69,8 +72,7 @@ means no ESP-NOW link.
 The config describes the hardware that is used.
 
 **Consequences**
-`94:B9:7E:DA:E2:14` is unaccounted for. If that board turns up, it is a spare. The
-label on the master board still has to be checked against this MAC.
+`94:B9:7E:DA:E2:14` is unaccounted for. If that board turns up, it is a spare.
 
 ---
 
