@@ -14,7 +14,7 @@ const char *STUDENT_NAME = "Laura";
 
 // Resend periodically so the slave still gets a message if it boots later
 // than the master or a packet is lost.
-const unsigned long SEND_INTERVAL_MS = 5000;
+const unsigned long GREETING_INTERVAL_MS = 5000;
 
 const uint8_t SLAVE_MAC[6] = MAC_SLAVE_MAIN_ROAD;
 
@@ -107,7 +107,7 @@ void setup() {
 }
 
 void loop() {
-  if (millis() - lastSendMs >= SEND_INTERVAL_MS) {
+  if (millis() - lastSendMs >= GREETING_INTERVAL_MS) {
     lastSendMs = millis();
     sendGreeting();
   }

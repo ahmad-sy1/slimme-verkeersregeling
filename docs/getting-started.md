@@ -146,13 +146,19 @@ pio run
 A working setup ends with:
 
 ```
-Environment    Status    Duration
--------------  --------  ------------
-master         SUCCESS   ...
-slave          SUCCESS   ...
-blink          SUCCESS   ...
-mac_address    SUCCESS   ...
-========================= 4 succeeded in ... =========================
+Environment       Status    Duration
+----------------  --------  ------------
+master            SUCCESS   ...
+slave             SUCCESS   ...
+blink             SUCCESS   ...
+mac_address       SUCCESS   ...
+espnow_master     SUCCESS   ...
+espnow_slave      SUCCESS   ...
+signal_head_test  SUCCESS   ...
+all_on            SUCCESS   ...
+pin_scan          SUCCESS   ...
+led_voltage       SUCCESS   ...
+========================= 10 succeeded in ... =========================
 ```
 
 Build output goes to `.pio/`, which is in `.gitignore`.
@@ -166,10 +172,15 @@ name with `-e`.
 
 | Environment | Source folder | What it is for |
 |---|---|---|
-| `master` | `src/master/` | Master controller: owns the intersection logic *(placeholder, not implemented yet)* |
-| `slave` | `src/slave/` | Slave controller: switches the LEDs for one approach *(placeholder, not implemented yet)* |
+| `master` | `src/master/` | Master controller: runs the fixed-timing cycle and broadcasts it to the slaves |
+| `slave` | `src/slave/` | Slave controller, for both slaves: picks its pin table by MAC address and switches its LEDs |
 | `blink` | `src/basics/blink/` | Practice: blinks the built-in LED on GPIO 2. Use it to check that uploading works |
 | `mac_address` | `src/basics/mac_address/` | Practice: prints this board's MAC address on the serial monitor |
+| `espnow_master` / `espnow_slave` | `src/basics/espnow_*/` | Practice: ESP-NOW greeting between two boards |
+| `signal_head_test` | `src/basics/signal_head_test/` | Hardware test: walks every signal head of a slave (red, orange, green) |
+| `all_on` | `src/basics/all_on/` | Hardware test: switches all 12 slave LEDs on |
+| `pin_scan` | `src/basics/pin_scan/` | Hardware test: drives chosen pins through serial commands |
+| `led_voltage` | `src/basics/led_voltage/` | Hardware test: measures the voltage over each LED |
 
 ### Commands
 
@@ -190,8 +201,8 @@ The monitor uses `monitor_speed = 115200` from `platformio.ini`, so you do not n
 set the baud rate. The MAC address is printed once at start-up; press the **EN** (reset)
 button on the board to print it again.
 
-Only `mac_address` prints anything to the serial monitor at the moment. `blink` shows its
-result on the LED, and `master` / `slave` do nothing yet.
+`blink` and `all_on` only show their result on the LEDs; the other environments print to
+the serial monitor. See [`wiring-check.md`](wiring-check.md) for the hardware test tools.
 
 ### More than one board connected
 
@@ -247,6 +258,6 @@ usually clearer there.
 | `Access is denied` / `could not open port` (Windows) or `Resource busy` (macOS) | Another program has the serial port open, usually a leftover Arduino IDE Serial Monitor, or a second `pio device monitor` in another terminal | Close the Arduino IDE and any other serial monitor, then try again |
 | Upload stuck on `Connecting........_____....` and then fails | The ESP32 did not enter download mode automatically | Run the upload again; when `Connecting...` appears, **hold the BOOT button** until the upload percentage starts, then release it |
 | No port visible in Device Manager or `ls /dev/cu.*` | Charge-only USB cable (no data wires), or missing driver | Try a different cable you know transfers data; check the [USB driver](#2-usb-driver) section |
-| `UnknownEnvNamesError` / `Unknown environment names 'X'` | The name after `-e` does not match an `[env:...]` in `platformio.ini` (typo, or `-` instead of `_`) | Use one of: `master`, `slave`, `blink`, `mac_address`. The error message lists the valid names |
+| `UnknownEnvNamesError` / `Unknown environment names 'X'` | The name after `-e` does not match an `[env:...]` in `platformio.ini` (typo, or `-` instead of `_`) | Use one of the names in [Build, upload and monitor](#4-build-upload-and-monitor). The error message lists the valid names |
 | First build is very slow | PlatformIO is downloading the ESP32 toolchain | Wait; this only happens once |
 | Serial monitor shows unreadable characters | Baud rate does not match the sketch | Open the monitor with `-e <env>` so it uses `monitor_speed` from `platformio.ini` |
