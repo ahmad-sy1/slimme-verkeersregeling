@@ -91,7 +91,7 @@ logic; the slaves execute and report back.
 
 - **Master (ESP32)** — maintains the state machine, determines timing, processes
   detection events and priority requests, and feeds data to the dashboard.
-- **Slave (ESP32 / Arduino)** — switches the red, yellow and green LEDs for a single
+- **Slave (ESP32)** — switches the red, yellow and green LEDs for a single
   approach and reports to the master whether vehicles are waiting.
 
 This split is deliberate: a single decision-maker makes it structurally impossible for
@@ -120,9 +120,9 @@ No simulation software is used; the prototype is a physical test setup.
 
 | Area | Choice |
 |---|---|
-| Microcontrollers | ESP32 (master), ESP32 or Arduino (slave) |
+| Microcontrollers | ESP32 (master and slaves) |
 | Firmware language | C++ (Arduino framework) |
-| Master ↔ slave communication | *(to be decided — see `docs/decisions.md`)* |
+| Master ↔ slave communication | ESP-NOW (see DEC-03 in docs/decisions.md) |
 | Dashboard | *(to be decided — see `docs/decisions.md`)* |
 
 ## Repository structure

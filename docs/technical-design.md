@@ -141,9 +141,10 @@ false detections from flickering light or a hand passing over:
 
 ## 3. Communication (ESP-NOW)
 
-The reasoning for choosing ESP-NOW is recorded as a decision in
-[`decisions.md`](decisions.md). In short: no router or network infrastructure is needed,
-latency is low, and the boards address each other by their fixed MAC addresses.
+The reasoning for choosing ESP-NOW is recorded as
+[DEC-03 in `decisions.md`](decisions.md#dec-03-esp-now-for-communication-between-master-and-slaves).
+In short: no router or network infrastructure is needed, latency is low, and the
+boards address each other by their fixed MAC addresses.
 
 ### Messages
 
